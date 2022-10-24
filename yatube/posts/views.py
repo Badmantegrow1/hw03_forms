@@ -1,20 +1,29 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm
-from .models import Post, Group, User
+from .models import Post, Group
+
+
+User = get_user_model()
 
 
 NUMBER_OF_POSTS: int = 10
 
 
-def index(request):
-    post_list = Post.objects.all()
-    paginator = Paginator(post_list, NUMBER_OF_POSTS)
+def paginator(request, post_list):
+    p = Paginator(post_list, NUMBER_OF_POSTS)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = p.get_page(page_number)
+    return page_obj
+
+
+def index(request):
+    post_list = Post.objects.select_related('author').all()
+    paginator(request, post_list)
     context = {
-        'page_obj': page_obj,
+        'page_obj': paginator(request, post_list)
     }
     return render(request, 'posts/index.html', context)
 
@@ -22,11 +31,9 @@ def index(request):
 def group_post(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = group.posts_group.all()
-    paginator = Paginator(post_list, NUMBER_OF_POSTS)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    paginator(request, post_list)
     context = {
-        'page_obj': page_obj,
+        'page_obj': paginator(request, post_list),
         'group': group,
     }
     return render(request, 'posts/group_list.html', context)
@@ -34,25 +41,21 @@ def group_post(request, slug):
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user).order_by('-pub_date')
-    paginator = Paginator(posts, NUMBER_OF_POSTS)
-    count = paginator.count
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = user.posts_author.all()
+    paginator(request, post_list)
     context = {
         'username': user,
-        'page_obj': page_obj,
-        'count': count,
+        'page_obj': paginator(request, post_list),
     }
     return render(request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    count_one = Post.objects.filter(author=post.author).count()
+    count = Post.objects.filter(author=post.author).count()
     context = {
         'post': post,
-        'count': count_one,
+        'count': count,
     }
     return render(request, 'posts/post_detail.html', context)
 

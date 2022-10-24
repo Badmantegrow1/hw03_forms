@@ -1,8 +1,5 @@
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth import get_user_model
-
-
-User = get_user_model()
 
 
 class Group(models.Model):
@@ -19,7 +16,9 @@ class Group(models.Model):
 
 
 class Post(models.Model):
-    text = models.TextField(verbose_name='Текст поста', max_length=3000)
+    objects = None
+    text = models.TextField(verbose_name='Текст поста',
+                            help_text='Введите текст поста', max_length=3000)
     pub_date = models.DateTimeField(verbose_name='Дата публикации',
                                     auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -27,6 +26,8 @@ class Post(models.Model):
                                related_name='posts_author')
     group = models.ForeignKey(Group, on_delete=models.SET_NULL,
                               verbose_name='Группа',
+                              help_text='Группа, к которой будет относиться '
+                                        'пост',
                               related_name="posts_group", blank=True,
                               null=True)
 
