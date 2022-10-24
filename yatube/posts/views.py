@@ -21,7 +21,6 @@ def paginator(request, post_list):
 
 def index(request):
     post_list = Post.objects.select_related('author').all()
-    paginator(request, post_list)
     context = {
         'page_obj': paginator(request, post_list)
     }
@@ -31,7 +30,6 @@ def index(request):
 def group_post(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = group.posts_group.all()
-    paginator(request, post_list)
     context = {
         'page_obj': paginator(request, post_list),
         'group': group,
@@ -42,7 +40,6 @@ def group_post(request, slug):
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     post_list = user.posts_author.all()
-    paginator(request, post_list)
     context = {
         'username': user,
         'page_obj': paginator(request, post_list),
