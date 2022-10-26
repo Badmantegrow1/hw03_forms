@@ -49,12 +49,7 @@ def profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    count = Post.objects.filter(author=post.author).count()
-    context = {
-        'post': post,
-        'count': count,
-    }
-    return render(request, 'posts/post_detail.html', context)
+    return render(request, 'posts/post_detail.html', {'post': post})
 
 
 @login_required

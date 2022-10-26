@@ -11,14 +11,15 @@
     </li>
   </ul>
   <p>
-    {{  post.text  }}
+    {{  post.text |linebreaksbr }}
   </p>
+
   <a href="{% url 'posts:post_detail' post.pk %}">
   подробная информация
   </a><br>
-</article>
 {% if post.group %}
 <a href="{% url 'posts:group_list' post.group.slug %}">
   все записи группы
 </a>
 {% endif %}
+</article>
