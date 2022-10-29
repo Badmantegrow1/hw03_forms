@@ -3,6 +3,7 @@ from django.db import models
 
 
 class Group(models.Model):
+    objects = None
     title = models.CharField(verbose_name='Название', max_length=200)
     slug = models.SlugField(verbose_name='Слаг', unique=True)
     description = models.TextField(verbose_name='Описание', max_length=200)
